@@ -3,7 +3,7 @@
 export const siteConfig = {
   name: "SAU EconHub",
   description: "Blogs & Question Bank for Agricultural Economics students at SAU.",
-  url: "https://your-domain.com",
+  url: "https://sau-blogs.vercel.app/",
 };
 
 /**
