@@ -24,7 +24,7 @@ export default async function AdminPostsPage() {
         </Button>
       </div>
 
-      <div className="rounded-xl border">
+      <div className="rounded-xl border overflow-x-auto">
         {posts && posts.length > 0 ? (
           <table className="w-full text-sm">
             <thead className="border-b bg-muted/50">
@@ -41,11 +41,10 @@ export default async function AdminPostsPage() {
                   <td className="px-4 py-3 font-medium">{post.title}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        post.published
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${post.published
                           ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                           : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
-                      }`}
+                        }`}
                     >
                       {post.published ? "Published" : "Draft"}
                     </span>

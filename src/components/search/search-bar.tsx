@@ -67,7 +67,7 @@ export function SearchBar() {
     return (
         <div ref={containerRef} className="relative">
             {/* Input */}
-            <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-1.5 text-sm focus-within:border-primary focus-within:bg-background transition-colors w-48 lg:w-64">
+            <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-1.5 text-sm focus-within:border-primary focus-within:bg-background transition-colors w-full md:w-48 lg:w-64">
                 {isPending ? (
                     <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
                 ) : (
