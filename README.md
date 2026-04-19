@@ -92,12 +92,12 @@ sau-blog/
 │   ├── context/                   # React Context providers
 │   ├── config.ts                  # Site-wide config (name, URL, SAU gate flag)
 │   └── middleware.ts              # Auth middleware (route protection)
-├── .env.local                     # Local environment variables (never commit)
+├── .env.local.example             # Environment variable template
 ├── .gitignore
 ├── components.json                # shadcn/ui component registry config
+├── eslint.config.mjs              # ESLint flat config
 ├── next.config.ts                 # Next.js configuration
 ├── postcss.config.mjs             # PostCSS / Tailwind CSS configuration
-├── tailwind.config.ts             # Tailwind CSS theme configuration
 ├── tsconfig.json                  # TypeScript compiler options
 └── package.json
 ```
@@ -112,7 +112,7 @@ Make sure you have the following installed before you begin:
 
 | Tool | Version | Link |
 |---|---|---|
-| Node.js | `v18+` | [nodejs.org](https://nodejs.org/) |
+| Node.js | `v20+` | [nodejs.org](https://nodejs.org/) |
 | npm | `v9+` | Bundled with Node.js |
 | Git | Latest | [git-scm.com](https://git-scm.com/) |
 
@@ -143,7 +143,11 @@ npm install
 Copy the example environment file and fill in your credentials:
 
 ```bash
+# macOS / Linux
 cp .env.local.example .env.local
+
+# Windows (PowerShell)
+copy .env.local.example .env.local
 ```
 
 Then open `.env.local` and populate it with your values (see the [Environment Variables](#-environment-variables) table below).
@@ -206,7 +210,7 @@ The main site configuration is in [`src/config.ts`](./src/config.ts):
 export const siteConfig = {
   name: "SAU EconHub",
   description: "Blogs & Question Bank for Agricultural Economics students at SAU.",
-  url: "https://your-domain.com",
+  url: "https://sau-blogs.vercel.app/",
 };
 
 // Set to false to disable SAU-specific branding and access gate
@@ -272,7 +276,8 @@ Contributions are welcome! Please follow these steps:
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for more information.
+This repository currently does not include a `LICENSE` file.  
+If you plan to open-source or distribute this project, add a license (for example, MIT) at the root.
 
 ---
 

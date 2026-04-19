@@ -6,14 +6,13 @@ import { FileText, PlusCircle } from "lucide-react";
 export default async function AdminPage() {
   const supabase = await createClient();
 
-  const { count: postCount } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true });
-
-  const { count: publishedCount } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true })
-    .eq("published", true);
+  const [{ count: postCount }, { count: publishedCount }] = await Promise.all([
+    supabase.from("posts").select("id", { count: "exact", head: true }),
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("published", true),
+  ]);
 
   return (
     <div className="space-y-8">

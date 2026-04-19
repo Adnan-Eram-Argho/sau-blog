@@ -9,20 +9,21 @@ import type { Post } from "@/lib/types";
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const { data: posts } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .limit(7);
+  const [{ data: posts }, { count: postCount }] = await Promise.all([
+    supabase
+      .from("posts")
+      .select("id, title, slug, excerpt, cover_image, created_at")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(7),
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("published", true),
+  ]);
 
   const featured = posts?.[0] ?? null;
   const recent = posts?.slice(1, 7) ?? [];
-
-  const { count: postCount } = await supabase
-    .from("posts")
-    .select("*", { count: "exact", head: true })
-    .eq("published", true);
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-10">

@@ -47,20 +47,19 @@ export default async function BlogPostPage({ params }: Props) {
 
   if (!post) notFound();
 
-  // Get current user
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data: currentProfile } = await supabase
-  .from("profiles")
-  .select("role")
-  .eq("id", user?.id ?? "")
-  .single();
-
-const currentUserRole = currentProfile?.role ?? "student";
-
-  // Get comments with author profiles
-const { data: comments } = await supabase
-  .from("comments")
-  .select(`
+  // Fetch supporting data in parallel after post load
+  const [
+    {
+      data: { user },
+    },
+    { data: comments },
+    { data: reactions },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("comments")
+      .select(
+        `
     *,
     profiles (
       id,
@@ -68,15 +67,25 @@ const { data: comments } = await supabase
       avatar_url,
       email
     )
-  `)
-  .eq("post_id", post.id)
-  .order("created_at", { ascending: true });
+  `
+      )
+      .eq("post_id", post.id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("reactions")
+      .select("*, profiles(id, full_name, email)")
+      .eq("post_id", post.id),
+  ]);
 
-  // Get reactions with reactor profiles
-  const { data: reactions } = await supabase
-    .from("reactions")
-    .select("*, profiles(id, full_name, email)")
-    .eq("post_id", post.id);
+  let currentUserRole = "student";
+  if (user?.id) {
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    currentUserRole = currentProfile?.role ?? "student";
+  }
 
   const reactors = reactions?.map((r) => r.profiles) ?? [];
   const userLiked = reactions?.some((r) => r.user_id === user?.id) ?? false;

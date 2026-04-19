@@ -97,7 +97,7 @@ export default function EditPostPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h2 className="text-xl font-semibold">Edit Post</h2>
+      <h2 className="text-xl font-semibold">Edit and Update Post</h2>
 
       <form action={handleSubmit} className="space-y-6">
         <input type="hidden" name="content" value={content} />
@@ -203,7 +203,7 @@ export default function EditPostPage() {
           >
             {uploading ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
-            ) : "Publish"}
+            ) : "Update & Publish"}
           </Button>
           <Button
             type="submit"

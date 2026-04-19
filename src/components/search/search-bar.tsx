@@ -12,6 +12,7 @@ export function SearchBar() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Post[]>([]);
     const [open, setOpen] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
     const [isPending, startTransition] = useTransition();
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -30,16 +31,12 @@ export function SearchBar() {
 
     // Debounced search
     useEffect(() => {
-        if (!query.trim()) {
-            setResults([]);
-            setOpen(false);
-            return;
-        }
-
+        if (!query.trim()) return;
         const timer = setTimeout(() => {
             startTransition(async () => {
                 const data = await searchPosts(query);
                 setResults(data);
+                setHasSearched(true);
                 setOpen(true);
             });
         }, 300);
@@ -78,7 +75,15 @@ export function SearchBar() {
                     type="text"
                     placeholder="Search posts..."
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                        const next = e.target.value;
+                        setQuery(next);
+                        if (!next.trim()) {
+                            setResults([]);
+                            setOpen(false);
+                            setHasSearched(false);
+                        }
+                    }}
                     onKeyDown={handleKeyDown}
                     className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-sm"
                 />
@@ -97,7 +102,7 @@ export function SearchBar() {
                             <div className="px-3 py-2 border-b">
                                 <p className="text-xs text-muted-foreground">
                                     {results.length} result{results.length !== 1 ? "s" : ""} for{" "}
-                                    <span className="font-medium text-foreground">"{query}"</span>
+                                    <span className="font-medium text-foreground">&quot;{query}&quot;</span>
                                 </p>
                             </div>
                             <ul>
@@ -146,13 +151,17 @@ export function SearchBar() {
                                     onClick={() => setOpen(false)}
                                     className="text-xs text-primary hover:underline"
                                 >
-                                    See all results for "{query}" →
+                                    See all results for &quot;{query}&quot; →
                                 </Link>
                             </div>
                         </>
+                    ) : hasSearched && !isPending ? (
+                        <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                            No results found for &quot;{query}&quot;
+                        </div>
                     ) : (
                         <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                            No results found for "{query}"
+                            Searching...
                         </div>
                     )}
                 </div>

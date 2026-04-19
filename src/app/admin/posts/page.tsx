@@ -9,7 +9,7 @@ export default async function AdminPostsPage() {
   const supabase = await createClient();
   const { data: posts } = await supabase
     .from("posts")
-    .select("*")
+    .select("id, title, published, created_at")
     .order("created_at", { ascending: false });
 
   return (
@@ -54,9 +54,10 @@ export default async function AdminPostsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" asChild>
+                      <Button variant="outline" size="sm" asChild>
                         <Link href={`/admin/posts/${post.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
                         </Link>
                       </Button>
                       <form
@@ -67,11 +68,12 @@ export default async function AdminPostsPage() {
                       >
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="sm"
                           type="submit"
                           className="text-destructive hover:text-destructive"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
                         </Button>
                       </form>
                     </div>

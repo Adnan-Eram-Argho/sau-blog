@@ -13,7 +13,7 @@ export default async function BlogPage() {
   const supabase = await createClient();
   const { data: posts } = await supabase
     .from("posts")
-    .select("*")
+    .select("id, title, slug, excerpt, cover_image, created_at")
     .eq("published", true)
     .order("created_at", { ascending: false });
 

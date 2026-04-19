@@ -27,6 +27,7 @@ export function CommentSection({
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function handleSubmit() {
     if (!text.trim()) return;
@@ -45,16 +46,24 @@ export function CommentSection({
           created_at: new Date().toISOString(),
         },
       ]);
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to post comment");
     } finally {
       setLoading(false);
     }
   }
 
   async function handleDelete(commentId: string) {
-    await deleteComment(commentId, slug);
-    setComments((prev) => prev.filter((c) => c.id !== commentId));
+    if (deletingId) return;
+    setDeletingId(commentId);
+    try {
+      await deleteComment(commentId, slug);
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to delete comment");
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   return (
@@ -134,10 +143,15 @@ export function CommentSection({
   <Button
     variant="ghost"
     size="icon"
+    disabled={deletingId === comment.id}
     className="h-6 w-6 text-muted-foreground hover:text-destructive"
     onClick={() => handleDelete(comment.id)}
   >
-    <Trash2 className="h-3 w-3" />
+    {deletingId === comment.id ? (
+      <Loader2 className="h-3 w-3 animate-spin" />
+    ) : (
+      <Trash2 className="h-3 w-3" />
+    )}
   </Button>
 )}
               </div>

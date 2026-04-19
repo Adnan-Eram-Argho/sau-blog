@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import cloudinary from "@/lib/cloudinary";
 import { getPublicIdFromUrl } from "@/lib/cloudinary-upload";
+
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
@@ -12,11 +13,31 @@ function generateSlug(title: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-export async function createPost(formData: FormData) {
+async function ensureAdmin() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin") {
+    throw new Error("Forbidden");
+  }
+
+  return { supabase, user };
+}
+
+export async function createPost(formData: FormData) {
+  const { supabase, user } = await ensureAdmin();
 
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
@@ -48,7 +69,7 @@ export async function createPost(formData: FormData) {
 }
 
 export async function updatePost(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { supabase } = await ensureAdmin();
 
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
@@ -57,11 +78,13 @@ export async function updatePost(id: string, formData: FormData) {
   const seo_title = formData.get("seo_title") as string;
   const seo_description = formData.get("seo_description") as string;
   const published = formData.get("published") === "true";
+  const slug = generateSlug(title);
 
   const { error } = await supabase
     .from("posts")
     .update({
       title,
+      slug,
       content,
       excerpt,
       cover_image,
@@ -80,7 +103,7 @@ export async function updatePost(id: string, formData: FormData) {
 }
 
 export async function deletePost(id: string) {
-  const supabase = await createClient();
+  const { supabase } = await ensureAdmin();
 
   // Get the post first to find the image URL
   const { data: post } = await supabase

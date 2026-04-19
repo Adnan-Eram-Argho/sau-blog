@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toggleReaction } from "@/app/actions/interactions";
-import { Heart } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Profile } from "@/lib/types";
 
@@ -26,16 +26,30 @@ export function ReactionButton({
   const [liked, setLiked] = useState(initialLiked);
   const [count, setCount] = useState(initialCount);
   const [showReactors, setShowReactors] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   async function handleToggle() {
     if (!currentUserId) {
       alert("Please login to react.");
       return;
     }
+    if (loading) return;
+
+    const nextLiked = !liked;
+    setLoading(true);
     // Optimistic update
-    setLiked((prev) => !prev);
-    setCount((prev) => (liked ? prev - 1 : prev + 1));
-    await toggleReaction(postId, slug);
+    setLiked(nextLiked);
+    setCount((prev) => (nextLiked ? prev + 1 : prev - 1));
+    try {
+      await toggleReaction(postId, slug);
+    } catch {
+      // Roll back on failure
+      setLiked(!nextLiked);
+      setCount((prev) => (nextLiked ? prev - 1 : prev + 1));
+      alert("Failed to update reaction. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -44,9 +58,14 @@ export function ReactionButton({
         variant={liked ? "default" : "outline"}
         size="sm"
         onClick={handleToggle}
+        disabled={loading}
         className="gap-2"
       >
-        <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
+        )}
         <span>{count}</span>
       </Button>
 
