@@ -2,8 +2,85 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SHOW_SAU_GATE } from "@/config";
+import { SHOW_SAU_GATE, siteConfig } from "@/config";
 import { createClient } from "@/lib/supabase/server";
+
+function HomeJsonLd() {
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteConfig.url}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    founder: {
+      "@type": "Person",
+      name: siteConfig.author.name,
+      url: siteConfig.author.url,
+    },
+    parentOrganization: {
+      "@type": "CollegeOrUniversity",
+      name: "Sher-e-Bangla Agricultural University",
+      alternateName: "SAU",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Dhaka",
+        addressCountry: "BD",
+      },
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteConfig.url,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
+      />
+    </>
+  );
+}
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -26,6 +103,7 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-10">
+      <HomeJsonLd />
 
       {/* ── Hero Banner ── */}
       <div className="mb-10 text-center">
@@ -38,6 +116,7 @@ export default async function HomePage() {
         </h1>
         <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
           Economics blogs, past questions, and AI summaries — all in one place.
+          A project by Adnan Eram Argho.
         </p>
       </div>
 

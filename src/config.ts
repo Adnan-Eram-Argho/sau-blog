@@ -2,8 +2,13 @@
 
 export const siteConfig = {
   name: "SAU EconHub",
-  description: "Blogs & Question Bank for Agricultural Economics students at SAU.",
+  description:
+    "SAU EconHub — the ultimate knowledge hub for Agricultural Economics students at Sher-e-Bangla Agricultural University (SAU). Explore blogs, past question banks, AI-powered summaries, and academic resources by Adnan Eram Argho.",
   url: "https://sau-blogs.vercel.app",
+  author: {
+    name: "Md. Adnan Eram Argho",
+    url: "https://bd.linkedin.com/in/md-adnan-eram-argho",
+  },
 };
 
 /**

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   metadataBase: new URL(siteConfig.url),
+  applicationName: "SAU EconHub",
   keywords: [
     "Agricultural Economics",
     "SAU",
@@ -23,9 +24,46 @@ export const metadata: Metadata = {
     "Question Bank",
     "Economics Blog",
     "Bangladesh",
+    "Argho blog",
+    "Adnan Eram Argho Blog",
+    "Md. Adnan Eram Argho",
+    "SAU EconHub",
+    "Agricultural Economics blog Bangladesh",
+    "SAU question bank",
+    "SAU AEC",
+    "AEC students SAU",
+    "Agricultural Economics notes",
+    "SAU past questions",
   ],
-  authors: [{ name: "SAU EconHub" }],
-  creator: "SAU EconHub",
+  authors: [
+    {
+      name: siteConfig.author.name,
+      url: siteConfig.author.url,
+    },
+  ],
+  creator: siteConfig.author.name,
+  publisher: siteConfig.author.name,
+  category: "education",
+  manifest: "/site.webmanifest",
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -47,11 +85,20 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SAU EconHub — Knowledge Hub for Agricultural Economics Students",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
+    images: ["/og-image.png"],
   },
   verification: {
     google: "DkJs8EUim9VsvxeFGZcqVDGc-1k9hApjEqNAuFsapyw",
