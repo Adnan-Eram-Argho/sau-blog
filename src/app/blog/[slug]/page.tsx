@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { AISummary } from "@/components/blog/ai-summary";
 import { CommentSection } from "@/components/blog/comment-section";
@@ -47,6 +48,28 @@ export default async function BlogPostPage({ params }: Props) {
     .single();
 
   if (!post) notFound();
+
+  const [previousPostResult, nextPostResult] = await Promise.all([
+    post.previous_slug
+      ? supabase
+          .from("posts")
+          .select("slug, title")
+          .eq("slug", post.previous_slug)
+          .eq("published", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    post.next_slug
+      ? supabase
+          .from("posts")
+          .select("slug, title")
+          .eq("slug", post.next_slug)
+          .eq("published", true)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  const previousPost = previousPostResult.data;
+  const nextPost = nextPostResult.data;
 
   // Fetch supporting data in parallel after post load
   const [
@@ -142,13 +165,49 @@ export default async function BlogPostPage({ params }: Props) {
       </div>
 
       {/* Comments */}
-<CommentSection
-  postId={post.id}
-  slug={slug}
-  initialComments={comments ?? []}
-  currentUserId={user?.id ?? null}
-  isAdmin={currentUserRole === "admin"}
-/>
+      <CommentSection
+        postId={post.id}
+        slug={slug}
+        initialComments={comments ?? []}
+        currentUserId={user?.id ?? null}
+        isAdmin={currentUserRole === "admin"}
+      />
+
+      {/* Previous/Next Learning Navigation */}
+      {(previousPost || nextPost) && (
+        <section className="mt-12 rounded-xl border bg-muted/30 p-4">
+          <p className="mb-3 text-sm font-medium">Continue Learning</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {previousPost ? (
+              <Link
+                href={`/blog/${previousPost.slug}`}
+                className="rounded-lg border bg-background p-3 text-sm transition-colors hover:border-primary"
+              >
+                <p className="text-xs text-muted-foreground">Previous Blog</p>
+                <p className="mt-1 font-medium">{previousPost.title}</p>
+              </Link>
+            ) : (
+              <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
+                No previous blog linked
+              </div>
+            )}
+
+            {nextPost ? (
+              <Link
+                href={`/blog/${nextPost.slug}`}
+                className="rounded-lg border bg-background p-3 text-sm text-right transition-colors hover:border-primary"
+              >
+                <p className="text-xs text-muted-foreground">Next Blog</p>
+                <p className="mt-1 font-medium">{nextPost.title}</p>
+              </Link>
+            ) : (
+              <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground sm:text-right">
+                No next blog linked
+              </div>
+            )}
+          </div>
+        </section>
+      )}
     </article>
   );
 }

@@ -1,302 +1,198 @@
-<div align="center">
+# SAU EconHub
 
-<h1>📚 SAU EconHub</h1>
-
-<p><strong>A modern blog and question bank platform for Agricultural Economics students at SAU.</strong></p>
+A modern academic content platform for Sher-e-Bangla Agricultural University (SAU), focused on Agricultural Economics blogs, learning resources, and AI-assisted reading support.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.2-black?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://vercel.com/)
 
-</div>
+---
+
+## Overview
+
+SAU EconHub is a full-stack Next.js application designed to centralize educational content for students and faculty. It combines:
+
+- A rich blog system with admin publishing tools
+- AI-powered article assistance (summary and translation)
+- Student engagement tools (comments and reactions)
+- Search and SEO-ready public pages
 
 ---
 
-## 📖 Description
+## Recent Updates
 
-**SAU EconHub** is a full-stack web platform built specifically for students and faculty of the Department of Agricultural Economics at Sher-e-Bangla Agricultural University (SAU). It solves the common problem of scattered, hard-to-find academic resources by providing a single, organized hub.
+The following major improvements were recently added:
 
-The platform offers:
-- A rich, searchable **blog** where admins can publish guides, lecture notes, and articles.
-- A structured **question bank** where past exam papers (midterms, finals, assignments) are archived and accessible by course, semester, and level.
-- **AI-powered summaries** for blog posts using Groq's LLM API, saving students reading time.
-- A secure **role-based access** system with SAU-gated registration, ensuring only verified students and faculty can access the platform.
-
-> This platform is designed to be **white-labelable** — a single config flag (`SHOW_SAU_GATE`) makes it deployable for any other university with minimal changes.
+- **AI blog translation (English -> Bangla)** on individual blog pages
+- **Math-friendly blog publishing** using KaTeX rendering (`$...$`, `$$...$$`, `\(...\)`, `\[...\]`)
+- **Equation authoring helpers** in the editor (inline/block templates + common symbols)
+- **Clipboard image paste support** in New/Edit post pages (Ctrl/Cmd+V)
+- **Redirect-safe publish/update flow** to prevent false upload error alerts
+- **Optional previous/next blog linking** in admin forms and reader-facing navigation
+- **Type-safety cleanups** for partial Supabase selects across search/listing pages
 
 ---
 
-## ✨ Key Features
+## Feature Set
 
-| Feature | Description |
+| Area | Features |
 |---|---|
-| 📝 **Rich Text Blog** | Full WYSIWYG editor (TipTap) with image uploads via Cloudinary |
-| 🗄️ **Question Bank** | Organized archive of past exam papers, filterable by level, semester, and course |
-| 🤖 **AI Summaries** | On-demand Groq/LLM-powered post summaries for quick comprehension |
-| 💬 **Engagement** | Per-post comment threads and emoji reactions for logged-in users |
-| 🔍 **Full-Text Search** | Instant search across all blog posts |
-| 🎨 **Dark Mode** | System-aware theme toggle powered by `next-themes` |
-| 🔐 **Secure Auth** | Supabase Auth with role-based access control (`student` / `admin`) |
-| ⚡ **SEO Ready** | Auto-generated sitemap (`/sitemap.xml`) and robots file (`/robots.txt`) |
+| Blog Authoring | TipTap editor, Cloudinary image uploads, paste-image support, SEO fields |
+| Blog Reading | AI summary, AI Bangla translation, KaTeX-rendered equations, comments, reactions |
+| Navigation | Optional previous/next post linking for guided learning flow |
+| Discovery | Full-text search and dedicated search results pages |
+| Security | Supabase Auth, role-based access (`student` / `admin`) |
+| Platform | Next.js App Router, dark mode, sitemap, robots |
 
 ---
 
-## 🗂️ Folder Structure
+## Tech Stack
 
-```
-sau-blog/
-├── public/                        # Static assets (favicons, images)
-├── src/
-│   ├── app/                       # Next.js App Router pages & layouts
-│   │   ├── actions/               # Server Actions (data fetching & mutations)
-│   │   │   ├── ai.ts              #   → AI summary generation via Groq
-│   │   │   ├── interactions.ts    #   → Comments & reactions CRUD
-│   │   │   ├── posts.ts           #   → Blog post queries & mutations
-│   │   │   ├── search.ts          #   → Full-text search action
-│   │   │   └── page.tsx           #   → Question bank actions & UI page
-│   │   ├── admin/                 # Admin-only area (post management)
-│   │   │   └── posts/             #   → Create / edit posts
-│   │   ├── auth/                  # Authentication callback handler
-│   │   ├── blog/                  # Public blog listing & detail pages
-│   │   │   └── [slug]/            #   → Individual post page (dynamic route)
-│   │   ├── dashboard/             # Logged-in user dashboard
-│   │   ├── login/                 # Login / registration page
-│   │   ├── search/                # Search results page
-│   │   ├── layout.tsx             # Root layout (fonts, theme provider, navbar)
-│   │   ├── page.tsx               # Homepage
-│   │   ├── sitemap.ts             # Auto-generated XML sitemap
-│   │   └── robots.ts              # robots.txt rules
-│   ├── components/                # Reusable UI components
-│   │   ├── blog/                  # Blog-specific components
-│   │   │   ├── ai-summary.tsx     #   → AI summary card
-│   │   │   ├── comment-section.tsx#   → Comment thread UI
-│   │   │   └── reaction-button.tsx#   → Emoji reaction button
-│   │   ├── editor/
-│   │   │   └── rich-text-editor.tsx # TipTap WYSIWYG editor wrapper
-│   │   ├── search/                # Search bar & input components
-│   │   ├── navbar.tsx             # Top navigation bar
-│   │   ├── theme-provider.tsx     # next-themes provider wrapper
-│   │   └── theme-toggle.tsx       # Dark/light mode toggle button
-│   ├── lib/                       # Utilities, clients & type definitions
-│   │   ├── supabase/
-│   │   │   ├── client.ts          #   → Browser-side Supabase client
-│   │   │   └── server.ts          #   → Server-side Supabase client (SSR)
-│   │   ├── cloudinary-upload.ts   # Cloudinary image upload helper
-│   │   ├── cloudinary.ts          # Cloudinary SDK configuration
-│   │   ├── types.ts               # Shared TypeScript interfaces & types
-│   │   └── utils.ts               # General utility functions (cn, etc.)
-│   ├── context/                   # React Context providers
-│   ├── config.ts                  # Site-wide config (name, URL, SAU gate flag)
-│   └── middleware.ts              # Auth middleware (route protection)
-├── .env.local.example             # Environment variable template
-├── .gitignore
-├── components.json                # shadcn/ui component registry config
-├── eslint.config.mjs              # ESLint flat config
-├── next.config.ts                 # Next.js configuration
-├── postcss.config.mjs             # PostCSS / Tailwind CSS configuration
-├── tsconfig.json                  # TypeScript compiler options
-└── package.json
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **UI:** Tailwind CSS, shadcn/ui, Lucide icons
+- **Editor:** TipTap
+- **Database/Auth:** Supabase
+- **Media:** Cloudinary
+- **AI:** Groq API
+- **Math Rendering:** KaTeX
+
+---
+
+## Project Structure
+
+```text
+src/
+  app/
+    actions/              # Server actions (posts, search, AI, interactions)
+    admin/posts/          # Admin post create/edit/list pages
+    blog/[slug]/          # Blog detail page
+    blog/                 # Blog list page
+    search/               # Search page
+  components/
+    blog/                 # AI summary, translation content, comments, reactions
+    editor/               # Rich text editor
+    search/               # Search UI
+  lib/
+    supabase/             # Server/client Supabase helpers
+    cloudinary*.ts        # Cloudinary helpers
+    types.ts              # Shared interfaces
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### Prerequisites
+### 1) Prerequisites
 
-Make sure you have the following installed before you begin:
+- Node.js `20+`
+- npm `9+`
+- Supabase project
+- Cloudinary account
+- Groq API key
 
-| Tool | Version | Link |
-|---|---|---|
-| Node.js | `v20+` | [nodejs.org](https://nodejs.org/) |
-| npm | `v9+` | Bundled with Node.js |
-| Git | Latest | [git-scm.com](https://git-scm.com/) |
-
-You will also need active accounts on:
-- **[Supabase](https://supabase.com/)** — for the database and authentication.
-- **[Cloudinary](https://cloudinary.com/)** — for image storage and delivery.
-- **[Groq](https://console.groq.com/)** — for AI-powered post summaries.
-
----
-
-### Installation
-
-**1. Clone the repository:**
+### 2) Install
 
 ```bash
 git clone https://github.com/your-username/sau-blog.git
 cd sau-blog
-```
-
-**2. Install dependencies:**
-
-```bash
 npm install
 ```
 
-**3. Set up environment variables:**
+### 3) Environment Setup
 
-Copy the example environment file and fill in your credentials:
+Copy `.env.local.example` to `.env.local` and set:
 
-```bash
-# macOS / Linux
-cp .env.local.example .env.local
+| Variable | Required | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service key (server only) |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret (server only) |
+| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Yes | Unsigned upload preset |
+| `GROQ_API_KEY` | Yes | Groq API key |
 
-# Windows (PowerShell)
-copy .env.local.example .env.local
-```
-
-Then open `.env.local` and populate it with your values (see the [Environment Variables](#-environment-variables) table below).
-
-**4. Run the development server:**
+### 4) Run
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the app.
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-### 🔑 Environment Variables
+## Database Notes (Important)
 
-Create a `.env.local` file in the project root with the following keys:
+Core tables:
 
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anonymous (public) key |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (server-only, keep secret) |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | ✅ | Your Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | ✅ | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | ✅ | Cloudinary API secret (server-only, keep secret) |
-| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | ✅ | Cloudinary unsigned upload preset name |
-| `GROQ_API_KEY` | ✅ | Groq API key for AI summary generation |
+- `profiles`
+- `posts`
+- `comments`
+- `reactions`
+- `question_bank`
 
-> **⚠️ Warning:** Never commit your `.env.local` file or any secrets to version control. The `.gitignore` is pre-configured to exclude it.
+To enable previous/next blog linking, run this SQL migration in Supabase:
+
+```sql
+alter table public.posts
+add column if not exists previous_slug text null,
+add column if not exists next_slug text null;
+```
+
+If not migrated, create/update still works due to backward-compatible fallback, but linked navigation will not persist.
 
 ---
 
-## 💻 Usage
+## Math Content Authoring Guide
 
-### Development
+You can write equations in post content using:
+
+- Inline: `$x^2 + y^2 = z^2$`
+- Block:
+  `$$
+  \sum_{i=1}^{n} x_i
+  $$`
+- Also supported: `\(...\)` and `\[...\]`
+
+KaTeX renders formulas on the blog reading page.
+
+---
+
+## NPM Scripts
 
 ```bash
-npm run dev      # Start the Next.js development server on http://localhost:3000
-```
-
-### Production Build
-
-```bash
-npm run build    # Create an optimized production build
-npm run start    # Start the production server
-```
-
-### Linting
-
-```bash
-npm run lint     # Run ESLint across the codebase
-```
-
-### Site Configuration
-
-The main site configuration is in [`src/config.ts`](./src/config.ts):
-
-```typescript
-export const siteConfig = {
-  name: "SAU EconHub",
-  description: "Blogs & Question Bank for Agricultural Economics students at SAU.",
-  url: "https://sau-blogs.vercel.app/",
-};
-
-// Set to false to disable SAU-specific branding and access gate
-export const SHOW_SAU_GATE = true;
+npm run dev
+npm run build
+npm run start
+npm run lint
 ```
 
 ---
 
-## 🗃️ Database Schema (Supabase)
+## Configuration
 
-The application uses the following core tables in Supabase:
+Main site config is in `src/config.ts`:
 
-| Table | Description |
-|---|---|
-| `profiles` | User profiles with `role` field (`student` or `admin`) |
-| `posts` | Blog posts with title, slug, content, cover image, and SEO fields |
-| `question_bank` | Exam papers with metadata (level, semester, course, type, year) |
-| `comments` | Per-post comment threads linked to `profiles` |
-| `reactions` | Per-post emoji reactions (`love`) linked to `profiles` |
-
-> Row Level Security (RLS) policies are managed in your Supabase dashboard. Ensure that `admin` role users have write access to `posts` and `question_bank`.
+- Site name/URL/description
+- `SHOW_SAU_GATE` toggle for SAU-specific gating/branding
 
 ---
 
-## 🛣️ Roadmap
+## Contributing
 
-- [ ] **Email notifications** for new comments and reactions
-- [ ] **User profiles** with public-facing pages and activity history
-- [ ] **Post tags & categories** for better organization and filtering
-- [ ] **Saved/bookmarked posts** for students
-- [ ] **Question bank upload** directly from the UI (for admin users)
-- [ ] **Multi-university support** with tenant-based configuration
-- [ ] **Mobile app** (React Native / Expo)
+1. Create a feature branch.
+2. Make focused, testable changes.
+3. Run `npm run lint` and `npm run build`.
+4. Open a pull request with a clear summary.
 
 ---
 
-## 🤝 Contributing
+## License
 
-Contributions are welcome! Please follow these steps:
-
-1. **Fork** the repository.
-2. **Create** a new feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit** your changes with a clear message:
-   ```bash
-   git commit -m "feat: add your feature description"
-   ```
-4. **Push** to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-5. **Open** a Pull Request against the `main` branch and describe your changes.
-
-### Code Style
-
-- This project uses **ESLint** and **TypeScript** for code quality. Ensure `npm run lint` passes before submitting a PR.
-- Follow the existing file and component naming conventions.
-- Keep components focused and reusable; place shared logic in `src/lib/`.
-
----
-
-## 📄 License
-
-This repository currently does not include a `LICENSE` file.  
-If you plan to open-source or distribute this project, add a license (for example, MIT) at the root.
-
----
-
-## 🙏 Acknowledgments
-
-This project is built with and is grateful for the following open-source projects:
-
-- **[Next.js](https://nextjs.org/)** — The React framework for production
-- **[Supabase](https://supabase.com/)** — Open-source Firebase alternative for database & auth
-- **[TipTap](https://tiptap.dev/)** — Headless, extensible rich-text editor
-- **[Tailwind CSS](https://tailwindcss.com/)** — A utility-first CSS framework
-- **[shadcn/ui](https://ui.shadcn.com/)** — Re-usable component library built on Radix UI
-- **[Cloudinary](https://cloudinary.com/)** — Media management and delivery platform
-- **[Groq](https://groq.com/)** — Fast LLM inference for AI-powered summaries
-- **[Lucide React](https://lucide.dev/)** — Beautiful & consistent icon set
-- **[next-themes](https://github.com/pacocoursey/next-themes)** — Perfect dark mode for Next.js
-
----
-
-<div align="center">
-  <p>Made with ❤️ for the students of <strong>Sher-e-Bangla Agricultural University</strong></p>
-</div>
+No license file is currently included in this repository. Add a `LICENSE` file before public redistribution if needed.

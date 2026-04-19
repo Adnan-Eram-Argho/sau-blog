@@ -22,6 +22,8 @@ export interface Post {
   seo_description: string | null;
   published: boolean;
   author_id: string | null;
+  previous_slug: string | null;
+  next_slug: string | null;
   created_at: string;
   updated_at: string;
 }

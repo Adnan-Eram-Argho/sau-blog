@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPost } from "@/app/actions/posts";
+import { createClient } from "@/lib/supabase/client";
 import { RichTextEditor } from "@/components/editor/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,21 @@ export default function NewPostPage() {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [availablePosts, setAvailablePosts] = useState<
+    { id: string; title: string; slug: string }[]
+  >([]);
+
+  useEffect(() => {
+    async function loadPosts() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, slug")
+        .order("created_at", { ascending: false });
+      setAvailablePosts(data ?? []);
+    }
+    loadPosts();
+  }, []);
 
   function setSelectedImage(file: File) {
     if (!file.type.startsWith("image/")) {
@@ -59,6 +75,15 @@ export default function NewPostPage() {
       }
       await createPost(formData);
     } catch (err) {
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "digest" in err &&
+        typeof err.digest === "string" &&
+        err.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
       alert("Something went wrong");
     } finally {
       setUploading(false);
@@ -163,6 +188,46 @@ export default function NewPostPage() {
               placeholder="Meta description for search engines..."
               rows={2}
             />
+          </div>
+        </div>
+
+        {/* Learning Flow (Optional) */}
+        <div className="rounded-xl border p-4 space-y-4">
+          <h3 className="font-medium">Learning Flow (Optional)</h3>
+          <p className="text-xs text-muted-foreground">
+            Link previous and next blogs so readers can follow a sequence.
+          </p>
+          <div className="space-y-2">
+            <Label htmlFor="previous_slug">Previous Blog</Label>
+            <select
+              id="previous_slug"
+              name="previous_slug"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              defaultValue=""
+            >
+              <option value="">None</option>
+              {availablePosts.map((post) => (
+                <option key={post.id} value={post.slug}>
+                  {post.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="next_slug">Next Blog</Label>
+            <select
+              id="next_slug"
+              name="next_slug"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              defaultValue=""
+            >
+              <option value="">None</option>
+              {availablePosts.map((post) => (
+                <option key={post.id} value={post.slug}>
+                  {post.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

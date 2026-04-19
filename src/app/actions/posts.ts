@@ -13,6 +13,13 @@ function generateSlug(title: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+function isMissingLinkColumnError(message: string): boolean {
+  return (
+    message.includes("previous_slug") ||
+    message.includes("next_slug")
+  );
+}
+
 async function ensureAdmin() {
   const supabase = await createClient();
   const {
@@ -46,10 +53,12 @@ export async function createPost(formData: FormData) {
   const seo_title = formData.get("seo_title") as string;
   const seo_description = formData.get("seo_description") as string;
   const published = formData.get("published") === "true";
+  const previous_slug = ((formData.get("previous_slug") as string) ?? "").trim() || null;
+  const next_slug = ((formData.get("next_slug") as string) ?? "").trim() || null;
 
   const slug = generateSlug(title);
 
-  const { error } = await supabase.from("posts").insert({
+  const basePayload = {
     title,
     slug,
     content,
@@ -59,7 +68,22 @@ export async function createPost(formData: FormData) {
     seo_description,
     published,
     author_id: user.id,
+  };
+
+  const linkPayload = {
+    previous_slug,
+    next_slug,
+  };
+
+  let { error } = await supabase.from("posts").insert({
+    ...basePayload,
+    ...linkPayload,
   });
+
+  // Backward-compatible path if DB migration for link columns is not applied yet.
+  if (error && isMissingLinkColumnError(error.message)) {
+    ({ error } = await supabase.from("posts").insert(basePayload));
+  }
 
   if (error) throw new Error(error.message);
 
@@ -78,22 +102,39 @@ export async function updatePost(id: string, formData: FormData) {
   const seo_title = formData.get("seo_title") as string;
   const seo_description = formData.get("seo_description") as string;
   const published = formData.get("published") === "true";
+  const previous_slug = ((formData.get("previous_slug") as string) ?? "").trim() || null;
+  const next_slug = ((formData.get("next_slug") as string) ?? "").trim() || null;
   const slug = generateSlug(title);
 
-  const { error } = await supabase
+  const basePayload = {
+    title,
+    slug,
+    content,
+    excerpt,
+    cover_image,
+    seo_title,
+    seo_description,
+    published,
+    updated_at: new Date().toISOString(),
+  };
+
+  const linkPayload = {
+    previous_slug,
+    next_slug,
+  };
+
+  let { error } = await supabase
     .from("posts")
     .update({
-      title,
-      slug,
-      content,
-      excerpt,
-      cover_image,
-      seo_title,
-      seo_description,
-      published,
-      updated_at: new Date().toISOString(),
+      ...basePayload,
+      ...linkPayload,
     })
     .eq("id", id);
+
+  // Backward-compatible path if DB migration for link columns is not applied yet.
+  if (error && isMissingLinkColumnError(error.message)) {
+    ({ error } = await supabase.from("posts").update(basePayload).eq("id", id));
+  }
 
   if (error) throw new Error(error.message);
 

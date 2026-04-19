@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Languages, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { translatePostToBangla } from "@/app/actions/ai";
+import renderMathInElement from "katex/contrib/auto-render";
+import "katex/dist/katex.min.css";
 
 interface TranslatableBlogContentProps {
   content: string;
@@ -12,6 +14,7 @@ interface TranslatableBlogContentProps {
 export function TranslatableBlogContent({
   content,
 }: TranslatableBlogContentProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
   const [translatedContent, setTranslatedContent] = useState("");
   const [showBangla, setShowBangla] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,20 @@ export function TranslatableBlogContent({
   }
 
   const currentContent = showBangla && translatedContent ? translatedContent : content;
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    renderMathInElement(contentRef.current, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      throwOnError: false,
+    });
+  }, [currentContent]);
 
   return (
     <section className="mt-2">
@@ -79,6 +96,7 @@ export function TranslatableBlogContent({
       </div>
 
       <div
+        ref={contentRef}
         className="prose prose-slate dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: currentContent }}
       />

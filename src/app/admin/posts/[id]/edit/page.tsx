@@ -24,11 +24,16 @@ export default function EditPostPage() {
   const [coverImage, setCoverImage] = useState("");
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
+  const [availablePosts, setAvailablePosts] = useState<
+    { id: string; title: string; slug: string }[]
+  >([]);
   const [fields, setFields] = useState({
     title: "",
     excerpt: "",
     seo_title: "",
     seo_description: "",
+    previous_slug: "",
+    next_slug: "",
     published: false,
   });
 
@@ -49,18 +54,27 @@ export default function EditPostPage() {
         .eq("id", id)
         .single();
 
+      const { data: postOptions } = await supabase
+        .from("posts")
+        .select("id, title, slug")
+        .neq("id", id)
+        .order("created_at", { ascending: false });
+
       if (data) {
         setFields({
           title: data.title ?? "",
           excerpt: data.excerpt ?? "",
           seo_title: data.seo_title ?? "",
           seo_description: data.seo_description ?? "",
+          previous_slug: data.previous_slug ?? "",
+          next_slug: data.next_slug ?? "",
           published: data.published ?? false,
         });
         setContent(data.content ?? "");
         setCoverImage(data.cover_image ?? "");
         setPreview(data.cover_image ?? "");
       }
+      setAvailablePosts(postOptions ?? []);
       setLoading(false);
     }
     load();
@@ -98,7 +112,16 @@ export default function EditPostPage() {
         formData.set("cover_image", coverImage);
       }
       await updatePost(id, formData);
-    } catch {
+    } catch (err) {
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "digest" in err &&
+        typeof err.digest === "string" &&
+        err.digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
       alert("Something went wrong");
     } finally {
       setUploading(false);
@@ -216,6 +239,52 @@ export default function EditPostPage() {
               value={fields.seo_description}
               onChange={(e) => setFields((p) => ({ ...p, seo_description: e.target.value }))}
             />
+          </div>
+        </div>
+
+        {/* Learning Flow (Optional) */}
+        <div className="rounded-xl border p-4 space-y-4">
+          <h3 className="font-medium">Learning Flow (Optional)</h3>
+          <p className="text-xs text-muted-foreground">
+            Link previous and next blogs so readers can follow a sequence.
+          </p>
+          <div className="space-y-2">
+            <Label htmlFor="previous_slug">Previous Blog</Label>
+            <select
+              id="previous_slug"
+              name="previous_slug"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              value={fields.previous_slug}
+              onChange={(e) =>
+                setFields((p) => ({ ...p, previous_slug: e.target.value }))
+              }
+            >
+              <option value="">None</option>
+              {availablePosts.map((post) => (
+                <option key={post.id} value={post.slug}>
+                  {post.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="next_slug">Next Blog</Label>
+            <select
+              id="next_slug"
+              name="next_slug"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              value={fields.next_slug}
+              onChange={(e) =>
+                setFields((p) => ({ ...p, next_slug: e.target.value }))
+              }
+            >
+              <option value="">None</option>
+              {availablePosts.map((post) => (
+                <option key={post.id} value={post.slug}>
+                  {post.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

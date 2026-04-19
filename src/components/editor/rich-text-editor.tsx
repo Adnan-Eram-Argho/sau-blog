@@ -22,7 +22,7 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
-const editor = useEditor({
+  const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit,
@@ -33,6 +33,21 @@ const editor = useEditor({
   });
 
   if (!editor) return null;
+
+  const mathTools = [
+    {
+      label: "Inline",
+      action: () => editor.chain().focus().insertContent("$x^2 + y^2$ ").run(),
+      title: "Insert inline equation",
+    },
+    {
+      label: "Block",
+      action: () => editor.chain().focus().insertContent("$$\\n\\sum_{i=1}^{n} x_i\\n$$\\n").run(),
+      title: "Insert block equation",
+    },
+  ];
+
+  const mathSymbols = ["sigma:σ", "pi:π", "mu:μ", "alpha:α", "beta:β", "theta:θ"];
 
   const tools = [
     {
@@ -110,11 +125,45 @@ const editor = useEditor({
         ))}
       </div>
 
+      {/* Math Toolbar */}
+      <div className="flex flex-wrap items-center gap-2 border-b px-2 py-2">
+        {mathTools.map((tool) => (
+          <Button
+            key={tool.title}
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={tool.action}
+            title={tool.title}
+          >
+            {tool.label}
+          </Button>
+        ))}
+        {mathSymbols.map((item) => {
+          const [label, symbol] = item.split(":");
+          return (
+            <Button
+              key={label}
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => editor.chain().focus().insertContent(symbol).run()}
+              title={`Insert ${label}`}
+            >
+              {symbol}
+            </Button>
+          );
+        })}
+      </div>
+
       {/* Editor */}
       <EditorContent
         editor={editor}
         className="prose prose-sm dark:prose-invert max-w-none p-4 min-h-[300px] focus:outline-none"
       />
+      <p className="px-4 pb-4 text-xs text-muted-foreground">
+        Math supported with KaTeX. Use <code>$...$</code> for inline and <code>$$...$$</code> for block equations. Pasted math syntax also renders in published posts.
+      </p>
     </div>
   );
 }
