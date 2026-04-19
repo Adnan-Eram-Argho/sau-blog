@@ -15,6 +15,11 @@ interface Props {
   initialComments: Comment[];
   currentUserId: string | null;
   isAdmin: boolean;
+  currentUserProfile?: {
+    full_name: string | null;
+    avatar_url: string | null;
+    email: string | null;
+  } | null;
 }
 
 export function CommentSection({
@@ -23,6 +28,7 @@ export function CommentSection({
   initialComments,
   currentUserId,
   isAdmin,
+  currentUserProfile,
 }: Props) { 
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [text, setText] = useState("");
@@ -44,6 +50,16 @@ export function CommentSection({
           author_id: currentUserId ?? "",
           content: text.trim(),
           created_at: new Date().toISOString(),
+          profiles: currentUserProfile
+            ? {
+                id: currentUserId ?? "",
+                full_name: currentUserProfile.full_name,
+                avatar_url: currentUserProfile.avatar_url,
+                email: currentUserProfile.email ?? "",
+                role: "student" as const,
+                created_at: new Date().toISOString(),
+              }
+            : undefined,
         },
       ]);
     } catch (err: unknown) {

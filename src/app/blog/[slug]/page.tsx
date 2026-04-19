@@ -202,6 +202,7 @@ export default async function BlogPostPage({ params }: Props) {
     },
     { data: comments },
     { data: reactions },
+    { data: authorProfile },
   ] = await Promise.all([
     supabase.auth.getUser(),
     supabase
@@ -223,17 +224,28 @@ export default async function BlogPostPage({ params }: Props) {
       .from("reactions")
       .select("*, profiles(id, full_name, email)")
       .eq("post_id", post.id),
+    post.author_id
+      ? supabase
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", post.author_id)
+          .single()
+      : Promise.resolve({ data: null }),
   ]);
 
   let currentUserRole = "student";
+  let currentUserProfile: { full_name: string | null; avatar_url: string | null; email: string | null } | null = null;
   if (user?.id) {
-    const { data: currentProfile } = await supabase
+    const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, full_name, avatar_url, email")
       .eq("id", user.id)
       .single();
-    currentUserRole = currentProfile?.role ?? "student";
+    currentUserRole = profile?.role ?? "student";
+    currentUserProfile = profile ? { full_name: profile.full_name, avatar_url: profile.avatar_url, email: profile.email } : null;
   }
+
+  const authorName = authorProfile?.full_name ?? siteConfig.author.name;
 
   const reactors = reactions?.map((r) => r.profiles) ?? [];
   const userLiked = reactions?.some((r) => r.user_id === user?.id) ?? false;
@@ -244,19 +256,31 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* Header */}
       <header className="mb-8">
-        <p className="mb-3 text-sm text-muted-foreground">
-          {new Date(post.created_at).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
         <h1 className="text-4xl font-bold leading-tight tracking-tight">
           {post.title}
         </h1>
         {post.excerpt && (
           <p className="mt-4 text-xl text-muted-foreground">{post.excerpt}</p>
         )}
+        <div className="mt-4 flex items-center gap-3">
+          {authorProfile?.avatar_url && (
+            <img
+              src={authorProfile.avatar_url}
+              alt={authorName}
+              className="h-10 w-10 rounded-full object-cover"
+            />
+          )}
+          <div>
+            <p className="text-sm font-medium">{authorName}</p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(post.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Cover Image */}
@@ -297,6 +321,7 @@ export default async function BlogPostPage({ params }: Props) {
         initialComments={comments ?? []}
         currentUserId={user?.id ?? null}
         isAdmin={currentUserRole === "admin"}
+        currentUserProfile={currentUserProfile}
       />
 
       {/* Previous/Next Learning Navigation */}
