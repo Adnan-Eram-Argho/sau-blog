@@ -2,7 +2,6 @@ import { searchPosts } from "@/app/actions/search";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import type { Post } from "@/lib/types";
 import { SearchPageInput } from "@/components/search/search-page-input";
 
 interface Props {
@@ -40,7 +39,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
                     {results.length > 0 ? (
                         <div className="space-y-4">
-                            {results.map((post: Post) => (
+                            {results.map((post) => (
                                 <Link
                                     key={post.id}
                                     href={`/blog/${post.slug}`}

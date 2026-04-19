@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Pencil, Trash2 } from "lucide-react";
 import { deletePost } from "@/app/actions/posts";
-import type { Post } from "@/lib/types";
 
 export default async function AdminPostsPage() {
   const supabase = await createClient();
@@ -36,7 +35,7 @@ export default async function AdminPostsPage() {
               </tr>
             </thead>
             <tbody>
-              {posts.map((post: Post) => (
+              {posts.map((post) => (
                 <tr key={post.id} className="border-b last:border-0">
                   <td className="px-4 py-3 font-medium">{post.title}</td>
                   <td className="px-4 py-3">

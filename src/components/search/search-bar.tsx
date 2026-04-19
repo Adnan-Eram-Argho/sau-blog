@@ -5,12 +5,12 @@ import { searchPosts } from "@/app/actions/search";
 import { Search, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import type { Post } from "@/lib/types";
+import type { PostSearchResult } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 export function SearchBar() {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<Post[]>([]);
+    const [results, setResults] = useState<PostSearchResult[]>([]);
     const [open, setOpen] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const [isPending, startTransition] = useTransition();

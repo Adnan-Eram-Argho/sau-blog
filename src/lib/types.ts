@@ -26,6 +26,11 @@ export interface Post {
   updated_at: string;
 }
 
+export type PostSearchResult = Pick<
+  Post,
+  "id" | "title" | "slug" | "excerpt" | "cover_image" | "created_at"
+>;
+
 export interface QuestionBank {
   id: string;
   level: string;

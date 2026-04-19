@@ -1,9 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { Post } from "@/lib/types";
+import type { PostSearchResult } from "@/lib/types";
 
-export async function searchPosts(query: string): Promise<Post[]> {
+export async function searchPosts(query: string): Promise<PostSearchResult[]> {
   if (!query.trim()) return [];
 
   const supabase = await createClient();

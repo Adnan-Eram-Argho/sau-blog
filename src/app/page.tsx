@@ -4,7 +4,6 @@ import { ArrowRight, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SHOW_SAU_GATE } from "@/config";
 import { createClient } from "@/lib/supabase/server";
-import type { Post } from "@/lib/types";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -107,7 +106,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {recent.map((post: Post) => (
+            {recent.map((post) => (
               <Link
                 key={post.id}
                 href={`/blog/${post.slug}`}

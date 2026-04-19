@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import type { Post } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -28,7 +27,7 @@ export default async function BlogPage() {
 
       {posts && posts.length > 0 ? (
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post: Post) => (
+          {posts.map((post) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
