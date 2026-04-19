@@ -18,11 +18,29 @@ export default function NewPostPage() {
   const [preview, setPreview] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  function setSelectedImage(file: File) {
+    if (!file.type.startsWith("image/")) {
+      alert("Please paste or choose an image file.");
+      return;
+    }
+    setPendingFile(file);
+    setPreview(URL.createObjectURL(file)); // local preview only
+  }
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPendingFile(file);
-    setPreview(URL.createObjectURL(file)); // local preview only
+    setSelectedImage(file);
+  }
+
+  function handlePasteImage(e: React.ClipboardEvent<HTMLDivElement>) {
+    const imageItem = Array.from(e.clipboardData.items).find((item) =>
+      item.type.startsWith("image/")
+    );
+    const file = imageItem?.getAsFile();
+    if (!file) return;
+    e.preventDefault();
+    setSelectedImage(file);
   }
 
   function handleRemoveImage() {
@@ -65,7 +83,7 @@ export default function NewPostPage() {
         {/* Cover Image */}
         <div className="space-y-2">
           <Label>Cover Image</Label>
-          <div className="flex items-center gap-4">
+          <div className="space-y-3">
             {!preview && (
               <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
                 <ImagePlus className="h-4 w-4" />
@@ -78,6 +96,15 @@ export default function NewPostPage() {
                 />
               </label>
             )}
+
+            <div
+              role="button"
+              tabIndex={0}
+              onPaste={handlePasteImage}
+              className="rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              Click here and press Ctrl/Cmd+V to paste an image
+            </div>
 
             {preview && (
               <div className="relative inline-block">

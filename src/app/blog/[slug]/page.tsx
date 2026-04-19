@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { AISummary } from "@/components/blog/ai-summary";
 import { CommentSection } from "@/components/blog/comment-section";
 import { ReactionButton } from "@/components/blog/reaction-button";
+import { TranslatableBlogContent } from "@/components/blog/translatable-blog-content";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -126,10 +127,7 @@ export default async function BlogPostPage({ params }: Props) {
       <AISummary content={post.content ?? ""} />
 
       {/* Content */}
-      <div
-        className="prose prose-slate dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content ?? "" }}
-      />
+      <TranslatableBlogContent content={post.content ?? ""} />
 
       {/* Reaction */}
       <div className="mt-10">
